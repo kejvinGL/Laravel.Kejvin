@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,9 +20,9 @@ class CommentFactory extends Factory
     {
 
         return [
-            'user_id' => 5,
-            'post_id' => 5,
-            'body' => implode(" ", [fake()->realText(150)]),
+            'user_id' => 0,
+            'post_id' => 0,
+            'body' => implode(" ", [fake()->realText(30)]),
         ];
 
     }

@@ -18,12 +18,10 @@ class EnsureUserIsAdmin
 
     public function handle(Request $request, Closure $next): Response|RedirectResponse
     {
-
-        if (auth()->user()->role()->pluck('id')->first() == 1) {
+        if (auth()->user()->role->id == 1) {
             return $next($request);
-
         }
 
-        return redirect(route('Home'), 301);
+        return redirect()->route('home');
     }
 }

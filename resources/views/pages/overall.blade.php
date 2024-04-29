@@ -2,23 +2,26 @@
 
 @section('title', 'Dashboard')
 
-@section('content')
-    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-base-200 h-full transition-all main flex flex-col mt-16 active">
 
-        <div class="p-5 flex flex-col items-center">
+@section('content')
+    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-base-200/50 h-full main pt-16 active transition-all">
+        <div class="h-16 flex-container justify-center">
+            <x-partials.messages.request-responses />
+        </div>
+        <div class="p-5 flex-container">
             <div class="grid grid-cols-1 md:grid-cols-2 w-3/4 gap-6 mb-6">
                 <div class="stat bg-base-100">
                     <div class="stat-figure text-secondary pr-3">
                         <i class="fa-regular fa-user fa-2xl"></i>
                     </div>
-                    <div class="stat-title">Total Clients</div>
+                    <div class="stat-title">{{__('Total Clients')}}</div>
                     <div class="stat-value">{{ $data['totalClients'] }}</div>
                 </div>
                 <div class="stat bg-base-100">
                     <div class="stat-figure text-secondary pr-3">
                         <i class="fa-solid fa-hammer fa-2xl"></i>
                     </div>
-                    <div class="stat-title">Total Admins</div>
+                    <div class="stat-title">{{__('Total Admins')}}</div>
                     <div class="stat-value">{{ $data['totalAdmins'] }}</div>
                 </div>
 
@@ -28,7 +31,7 @@
                     <div class="stat-figure text-secondary pr-3">
                         <i class="fa-solid fa-inbox fa-2xl"></i>
                     </div>
-                    <div class="stat-title">Total Number of Posts</div>
+                    <div class="stat-title">{{__('Total Number of Posts')}}</div>
 
                     <div class="stat-value">{{$data['totalPosts']}}</div>
                     <div class="stat-desc">{{$data['recentPosts']}} (last 24h)</div>

@@ -14,13 +14,15 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
+            $table->foreignId('post_id')->nullable()->constrained();
             $table->string('path')->unique();
             $table->string('hash_name')->unique();
-            $table->string('original_name')->unique();
+            $table->string('original_name');
             $table->string('ext', 10);
             $table->integer('size');
             $table->string('type',50);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

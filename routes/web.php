@@ -1,64 +1,104 @@
 <?php
 
-use App\Http\Controllers\Admin\CreateUserController;
-use App\Http\Controllers\Admin\DeletePostController;
-use App\Http\Controllers\Admin\DeleteUserController;
-use App\Http\Controllers\Admin\EditUserController;
-use App\Http\Controllers\Profile\AvatarController;
-use App\Http\Controllers\Profile\DeleteSelfController;
-use App\Http\Controllers\Profile\DetailsController;
-use App\Http\Controllers\Profile\PasswordController;
-use App\Http\Controllers\Profile\ThemeController;
-use App\Http\Controllers\Resources\CommentController;
-use App\Http\Controllers\Resources\PostController;
-use App\Http\Controllers\View\AccessController;
-use App\Http\Controllers\View\FeedController;
-use App\Http\Controllers\View\HomeController;
-use App\Http\Controllers\View\OverallController;
-use App\Http\Controllers\View\PostListController;
-use App\Http\Controllers\View\ProfileController;
-use App\Http\Controllers\View\UserListController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Authentication\ForgotPasswordController;
+use App\Http\Controllers\Authentication\LoginController;
+use App\Http\Controllers\Authentication\RegisterController;
+use App\Http\Controllers\Authentication\ResetPasswordController;
+use App\Http\Controllers\Authentication\VerificationController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LangController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Auth::routes();
+// Authentication Routes
+Route::middleware(['guest', 'set.locale'])->group(function () {
+    Route::get('login', [LoginController::class, 'index'])->name('login');
+    Route::get('register', [RegisterController::class, 'index'])->name('register');
+
+    Route::post('auth/login', [LoginController::class, 'login'])->name('auth.login');
+    Route::post('auth/register', [RegisterController::class, 'register'])->name('auth.register');
+
+});
+
+Route::group(['prefix' => 'password'], function () {
+    Route::get('reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+});
+// verification Routes
+Route::group(['prefix' => 'email'], function () {
+    Route::get('verify', [VerificationController::class, 'show'])->name('verification.notice');
+    Route::get('verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');
+    Route::post('resend', [VerificationController::class, 'resend'])->name('verification.resend');
+});
 
 
-Route::middleware('auth')->group(function () {
-
+Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::redirect('/', '/home');
-    Route::get('/home', HomeController::class)->name("Home")->middleware('client');
-    Route::get('/feed', FeedController::class)->name("Feed")->middleware('client');
+    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+//    Client Routes
+    Route::middleware(["client"])->group(function () {
+        Route::get('home', [HomeController::class, 'home'])->name("home");
+        Route::get('feed', [HomeController::class, 'feed'])->name("feed");
 
-    Route::middleware("admin")->group(function () {
-        Route::get('overall', OverallController::class)->name('Overall');
-        Route::get('posts', PostListController::class)->name('PostList');
-        Route::get('users', UserlistController::class)->name('UserList');
-        Route::get('access', AccessController::class)->name('Access');
+        Route::post('posts/create', [PostController::class, 'store'])->name('post.store');
+        Route::post('comments/create/{post}', [CommentController::class, 'store'])->name('comment.store');
+    });
+
+//    Admin Routes
+    Route::middleware(["admin"])->group(function () {
+        Route::get('overall', [HomeController::class, 'overall'])->name("overall");
+        Route::get('posts', [PostController::class, 'index'])->name('post_list');
+        Route::get('users', [UserController::class, 'index'])->name('user_list');
+        Route::get('access', [UserController::class, 'create'])->name('access');
+        Route::get('api_keys', [ApiController::class, 'index'])->name('api_keys');
+
 
         Route::name('admin.')->group(function () {
-            Route::post('create', CreateUserController::class)->name('create');
-            Route::delete('user/delete/{id}', DeleteUserController::class)->name('user.destroy');
-            Route::delete('post/delete/{id}', DeletePostController::class)->name('post.destroy');
-            Route::put('edit/{id}', EditUserController::class)->name('edit');
+            Route::prefix('users')->group(function () {
+                Route::post('create', [UserController::class, 'store'])->name('user.create');
+                Route::delete('delete/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+                Route::delete('delete/{user}/force', [UserController::class, 'forceDestroy'])->name('user.force_destroy');
+                Route::put('edit/{user}', [UserController::class, 'edit'])->name('user.edit');
+                Route::put('restore/{user}', [UserController::class, 'restore'])->name('user.restore');
+
+
+            });
+            Route::prefix('api_keys')->group(function () {
+                Route::post('create', [ApiController::class, 'store'])->name('api_key.store');
+                Route::delete('delete/{key}', [ApiController::class, 'destroy'])->name('api_key.destroy');
+                Route::put('edit/{key}', [ApiController::class, 'edit'])->name('api_key.edit');
+            });
         });
+
+
     });
+    Route::delete('posts/delete/{post}', [PostController::class, 'destroy'])->name('post.destroy')->can('delete', 'post');
+    Route::delete('comments/delete/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy')->can('delete', 'comment');
 
-    Route::get('/profile', ProfileController::class)->name('Profile');
+//    Profile Routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 
-    Route::name('profile.')->prefix('profile')->group(function () {
-        Route::put('details', DetailsController::class)->name("details");
-        Route::put('password', PasswordController::class)->name('password');
-        Route::put('avatar', AvatarController::class)->name('avatar');
-        Route::delete('delete', DeleteSelfController::class)->name('destroy');
-        Route::put('theme', ThemeController::class)->name('theme');
+    Route::name('profile.')->prefix('profile')->middleware('verified')->group(function () {
+        Route::put('details/{user}', [ProfileController::class, 'details'])->name("details")->can('update', 'user');
+        Route::put('password/{user}', [ProfileController::class, 'password'])->name('password')->can('update', 'user');;
+        Route::put('avatar', [ProfileController::class, 'avatar'])->name('avatar');
+        Route::delete('delete/{user}', [UserController::class, 'forceDestroy'])->name('destroy')->can('forceDelete', 'user');
     });
-
-    Route::resource('post', PostController::class)->only(['store', 'destroy']);
-
-    Route::post('comment/{id}', [CommentController::class, 'store'])->name('comment.store');
-    Route::delete('comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy');
 });
+
+Route::put('theme', ThemeController::class)->name('theme');
+Route::put('lang', LangController::class)->name('lang');
+
+
+
+
 
 
 

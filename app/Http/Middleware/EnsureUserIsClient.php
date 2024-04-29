@@ -16,10 +16,10 @@ class EnsureUserIsClient
 
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->user()->role()->pluck('id')->first() == 2) {
+        if (auth()->user()->role->id == 2) {
             return $next($request);
         }
 
-        return redirect(route('Overall'), 301);
+        return redirect(route('overall'), 301);
     }
 }

@@ -1,15 +1,19 @@
-<div class="h-20 w-full mb-12 last:mb-4">
-    <img src="{{$comment['avatar']}}" class="size-8 inline" alt="commenter">
-    <span class="text-accent">{{$comment["poster"]}}</span>
-    @if($comment['user_id'] === auth()->id())
-        <form class="inline" method="POST" action="{{route('comment.destroy',$comment['id'])}}">
-            @csrf
-            @method("DELETE")
-            <button class="btn btn-error btn-xs size-5" type="submit">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </form>
-    @endif
-    <br>
+<div class="h-20 w-full">
+    <div class="flex justify-between w-full ">
+        <div>
+            <img src="{{$comment->user->getAvatar()}}" class="size-8 inline" alt="commenter">
+            <span>{{$comment->user->name}}</span>
+        </div>
+        @can('delete', $comment)
+            <form class="inline" method="POST" action="{{route('comment.destroy', $comment)}}">
+                @csrf
+                @method("DELETE")
+                <button class="btn btn-error btn-xs size-5" type="submit">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        @endcan
+    </div>
     <span class="text-xs">{{$comment['body']}}</span>
+
 </div>
