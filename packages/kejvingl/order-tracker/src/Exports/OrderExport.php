@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
+class OrderExport
 {
     /**
      * @return \Illuminate\Support\Collection
