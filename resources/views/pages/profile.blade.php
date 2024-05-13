@@ -3,7 +3,7 @@
 @section('title', 'Profile')
 
 @section('content')
-    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-base-200/50 min-h-screen transition-all main flex-container justify-center active pt-16">
+    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-base-200/50 min-h-screen transition-all main flex-container justify-center active">
         @php
             if (!session()->has('tab')) {
                 session(['tab' => 'avatar']);

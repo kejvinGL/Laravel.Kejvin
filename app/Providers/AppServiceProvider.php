@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Policies\PostPolicy;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\ServiceProvider;
+use Yajra\DataTables\Html\Builder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
     }
     public function boot()
     {
+        Builder::useVite();
     }
 
 }

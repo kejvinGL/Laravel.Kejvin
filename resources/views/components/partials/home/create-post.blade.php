@@ -14,7 +14,7 @@
                         class="flex-container w-full justify-between bg-base-200 border border-secondary rounded-2xl p-2">
                         <div class="flex w-full h-1/6 ">
                             <div class="flex rounded-xl w-full items-center">
-                                <img src="{{auth()->user()->getAvatar()}}" class="size-8" alt="avatar"/>
+                                <img src="{{auth()->user()->getAvatar()}}" class="size-8" alt="{{auth()->user()->avatar->original_name ?? 'avatar'}}"/>
                                 <span class="m-3">
                                         {{auth()->user()->name}}
                                 </span>

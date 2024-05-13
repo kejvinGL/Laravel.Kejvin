@@ -1,4 +1,4 @@
-<nav class="fixed z-20 navbar bg-base-100 top-0">
+<nav class="fixed z-30 navbar bg-base-100 top-0 gap-5">
     <div class="flex-1">
         @auth
             <button type="button" class="text-lg text-neutral-400 size-10 btn btn-ghost sidebar-toggle">
@@ -12,18 +12,14 @@
             <a class="btn-ghost text-neutral-500" href="/profile">{{auth()->user()->username}}</a>
        @endauth
     </div>
-    <form method="post" action="">
-
-    </form>
-
     @auth
-        <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar z-10  mx-4 flex">
+        <div class="dropdown dropdown-end dropdown-hover">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar z-20  mx-4 flex">
                 <div class="w-10 rounded-full">
-                    <img alt="avatar" src="{{auth()->user()->getAvatar()}}" />
+                    <img alt="{{auth()->user()->avatar->original_name ?? 'avatar'}}" src="{{auth()->user()->getAvatar()}}" />
                 </div>
             </div>
-            <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 -translate-y-[55px] -translate-x-[70px]">
+            <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 -translate-y-[55px] -translate-x-[15px]">
                 <p class="text-xs " role="none">
                     {{ auth()->user()->name}}
                     <br>
@@ -40,10 +36,15 @@
             </ul>
         </div>
     @endauth
+
+    @guest
+        <a class="btn btn-sm rounded-3xl" href="{{route('create.transaction')}}"> <i class="fa-solid fa-cart-shopping"></i>Purchase API Key</a>
+    @endguest
+
     <form class="size-8" action="{{route("theme")}}" method="POST">
         @method('PUT')
         @csrf
-        <label class="cursor-pointer">
+        <label class="cursor-pointer mx-auto">
             <i class="fa-solid fa-lightbulb fa-xl"></i>
             <input type="submit" hidden>
         </label>
@@ -52,7 +53,7 @@
     <form action="{{route("lang")}}" method="POST">
         @method('PUT')
         @csrf
-        <select name="lang" class="select select-ghost outline-0 text-xl text-accent pr-8" onchange="document.getElementById('submitButton').click();">
+        <select name="lang" class="select select-ghost outline-0 text-xl text-accent" onchange="document.getElementById('submitButton').click();">
             @foreach(['en', 'al'] as $lang)
                 <option value="{{ $lang }}" @if(app()->currentLocale() == $lang) selected @endif>{{ strtoupper($lang) }}</option>
             @endforeach

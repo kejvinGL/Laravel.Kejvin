@@ -9,40 +9,29 @@ use Illuminate\Support\Facades\DB;
 class PostService
 {
 
-    public function store(array $data)
+    public function store(array $data): Post
     {
-        try {
-            DB::beginTransaction();
+        return DB::transaction(function () use ($data) {
             $post = Post::create([
                 'user_id' => auth()->id(),
                 'title' => $data['title'],
                 'body' => $data['body'],
             ]);
-            if ($data['media']) {
+            if (array_key_exists('media', $data)) {
                 (new MediaService)->store($data['media'], $post);
             }
-            DB::commit();
             return $post;
-        } catch (\Exception $e) {
-            report($e);
-            DB::rollBack();
-        }
-
+        });
     }
 
     public function destroy(Post $post, bool $forceDelete = false)
     {
-        try {
-            DB::beginTransaction();
+
+        DB::transaction(function () use ($post, $forceDelete) {
             $forceDelete ? $post->forceDelete() : $post->delete();
             (new CommentService)->destroyPostComments($post, $forceDelete);
             (new MediaService)->destroyPostMedia($post, $forceDelete);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            report($e);
-            DB::rollBack();
-        }
+        });
     }
 
     public function destroyUserPosts(User $user, bool $forceDelete = false)
@@ -56,14 +45,20 @@ class PostService
     }
 
 
-    public function getUserPosts(int|string|null $id)
+    public function getUserPostsFeed(int|string|null $id)
     {
-        return Post::SortedUserPosts($id)->paginate(5);
+        return Post::sortedUserPosts($id)->paginate(5);
+    }
+
+
+    public function getUserPosts(User $user)
+    {
+        return Post::whereBelongsTo($user)->get();
     }
 
     public function getPostList()
     {
-        return Post::SortedPostList()->paginate(10);
+        return Post::sortedPostList()->paginate(10);
     }
 
 

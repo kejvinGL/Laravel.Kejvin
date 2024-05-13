@@ -6,10 +6,10 @@
             @method('PUT')
             <div class="flex-container justify-evenly">
                 <div class="size-36 mask mask-circle mb-8">
-                    <img src="{{ auth()->user()->getAvatar() }}" class="size-full" alt="avatar" />
+                    <img src="{{ auth()->user()->getAvatar() }}" class="size-full" alt="{{auth()->user()->avatar->original_name ?? 'avatar'}}" />
                 </div>
                 <label class="form-control w-full self-end">
-                    <input name="avatar" type="file" accept="image/png, image/gif, image/jpeg" class="file-input file-input-bordered @error('avatar') file-input-error @enderror " onchange="enableChange(this)" />
+                    <input name="avatar" type="file" formenctype="multipart/form-data" accept="image/png, image/gif, image/jpeg" class="file-input file-input-bordered @error('avatar') file-input-error @enderror " onchange="enableChange(this)" />
                 </label>
             </div>
         </form>

@@ -1,7 +1,7 @@
 <div class="collapse">
     <input name="show" type="checkbox"/>
     <div class="collapse-title">
-        <i class="fa-solid fa-comment"></i> Comments ({{$post->comments_count}})
+        <i class="fa-solid fa-comment"></i> Comments ({{$post->comments_count ?? 0}})
     </div>
     <div class="collapse-content">
         <form class="mt-5" method="POST" action="{{route('comment.store',$post)}}">

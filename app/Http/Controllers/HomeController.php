@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\TestingMail;
 use App\Models\Post;
 use App\Models\User;
-use App\Services\MediaService;
 use App\Services\PostService;
-use App\Services\UserService;
+use Illuminate\View\View;
 
 
 class HomeController extends Controller
@@ -15,21 +13,21 @@ class HomeController extends Controller
     public function __construct( private PostService $postService)
     {
     }
-    public function home()
+    public function home(): View
     {
-        $posts = $this->postService->getUserPosts(auth()->id());
+        $posts = $this->postService->getUserPostsFeed(auth()->id());
 
-        return view('pages.home', ['posts' => $posts]);
+        return view('pages.client.home', ['posts' => $posts]);
     }
 
-    public function feed()
+    public function feed(): View
     {
         $posts = $this->postService->getPostList();
 
-        return view('pages.home', ['posts' => $posts]);
+        return view('pages.client.home', ['posts' => $posts]);
     }
 
-    public function overall()
+    public function overall(): View
     {
         $data =[
             'totalClients' => User::whereRole("client")->count(),
@@ -37,8 +35,7 @@ class HomeController extends Controller
             'totalPosts' => Post::count(),
             'recentPosts' => Post::recentPosts(),
         ];
-
-        return view('pages.overall', ['data' => $data]);
+        return view('pages.admin.overall', ['data' => $data]);
     }
 
 }

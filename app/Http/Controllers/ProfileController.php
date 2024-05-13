@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\EditAvatarRequest;
 use App\Http\Requests\User\EditPasswordRequest;
-use App\Http\Requests\User\EditUserRequest;
+use App\Http\Requests\User\EditUserDetailsRequest;
 use App\Models\User;
+use App\Notifications\DetailsChangedNotification;
+use App\Notifications\PasswordChangedNotification;
 use App\Services\MediaService;
 use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
@@ -15,16 +17,23 @@ use Illuminate\Support\Facades\Session;
 class ProfileController extends Controller
 {
 
+    public function __construct(private UserService $userService)
+    {
+    }
+
     public function index()
     {
         return view('pages.profile');
     }
 
-    public function details(EditUserRequest $request, User $user): RedirectResponse
+    public function details(EditUserDetailsRequest $request): RedirectResponse
     {
         Session::flash('tab', 'details');
         try {
-            (new UserService)->editDetails($request->validated(), $user);
+            if ($this->userService->editDetails($request->validated(), auth()->user())) {
+                auth()->user()->notify(new DetailsChangedNotification(auth()->user()));
+            }
+
             return back()->with('success', 'User details updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'User details could not be updated. <br> ' . $e->getMessage());
@@ -36,7 +45,9 @@ class ProfileController extends Controller
     {
         Session::flash('tab', 'password');
         try {
-            (new UserService)->editPassword($request->validated(), $user);
+            if ($this->userService->editPassword($request->validated(), auth()->user())) {
+                $user->notify(new PasswordChangedNotification($user));
+            }
             return back()->with('success', 'User password updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while updating user password.' . $e->getMessage());

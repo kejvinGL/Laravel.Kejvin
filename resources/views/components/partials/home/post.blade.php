@@ -3,7 +3,7 @@
     <div class="flex w-full">
         <div class="flex flex-col w-full h-1/6 items-center min-h-[45px]">
             <div class="flex rounded-xl w-full items-center">
-                <img src="{{$post->user->getAvatar()}}" class="size-8" alt="avatar"/>
+                <img src="{{$post->user->getAvatar()}}" class="size-8" alt="{{$post->user->avatar->original_name ?? 'avatar'}}"/>
                 <span class="m-3">
                 {{$post->user->name}}
             </span>

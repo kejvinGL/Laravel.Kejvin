@@ -1,5 +1,5 @@
 <x-partials.messages.success>
-        {{ session('success') }}
+    {{ session('success') }}
 </x-partials.messages.success>
 
 <x-partials.messages.error>

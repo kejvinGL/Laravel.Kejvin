@@ -5,45 +5,38 @@ namespace App\Services;
 use App\Models\User;
 use App\Events\UserDeleted;
 use App\Events\UserRegistered;
-use App\Notifications\DetailsChangedNotification;
-use App\Notifications\PasswordChangedNotification;
+use Carbon\Carbon;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Yajra\DataTables\DataTables;
 
 
 class UserService
 {
-    public function store(array $data)
+    public function store(array $data): User
     {
-        try {
-            DB::beginTransaction();
+        DB::transaction(function () use ($data) {
             $this->checkTrashedUsers($data);
-        } catch (\Exception $e) {
-            report($e);
-            DB::rollBack();
-        }
+        });
         $user = User::create([
-            'role_id' => $data['role'],
             'username' => $data['username'],
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role_id' => $data['role'],
         ]);
         $link = (new LinkGeneratorService())->createEmailVerificationLink($user);
         UserRegistered::dispatch($user, $link);
         return $user;
     }
 
-    public function storeClient(array $data)
+    public function storeClient(array $data): User
     {
-        try {
-            DB::beginTransaction();
+        DB::transaction(function () use ($data) {
             $this->checkTrashedUsers($data);
-            DB::commit();
-        } catch (\Exception $e) {
-            report($e);
-            DB::rollBack();
-        }
+        });
         $user = User::create([
             'role_id' => 2,
             'username' => $data['username'],
@@ -51,79 +44,67 @@ class UserService
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-        $link = (new LinkGeneratorService())->createEmailVerificationLink($user);
-        UserRegistered::dispatch($user, $link);
-
         return $user;
     }
 
-    public function destroy(User $user, bool $forceDelete = false)
+    public function destroy(User $user, bool $forceDelete)
     {
-        try {
-            DB::beginTransaction();
-
+        DB::transaction(function () use ($user, $forceDelete) {
             (new CommentService)->destroyUserComments($user, $forceDelete);
             (new MediaService)->destroyUserMedia($user, $forceDelete);
             (new PostService)->destroyUserPosts($user, $forceDelete);
             $forceDelete ? $user->forceDelete() : $user->delete();
 
             UserDeleted::dispatch($user);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            report($e);
-            DB::rollBack();
-        }
+        });
     }
 
-    public function restore($user)
+    public function restore($user): User
     {
-        try {
-            DB::beginTransaction();
-
+        return DB::transaction(function () use ($user) {
             User::withTrashed()->find($user)->restore();
-
             $user = User::find($user);
             (new MediaService)->restoreUserMedia($user);
             (new PostService)->restoreUserPosts($user);
             (new CommentService)->restoreUserComments($user);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            report($e);
-            DB::rollBack();
-        }
+            return $user;
+        });
     }
 
-    public function editDetails(array $data, User $user)
+    public function editDetails(array $data, Authenticatable|User $user): bool
     {
-        if ($user->update(['username' => $data['new_username'], 'email' => $data['new_email']])) {
-            $user->notify(new DetailsChangedNotification($user));
-        }
+        return $user->update([
+            'username' => $data['new_username'],
+            'email' => $data['new_email'],
+        ]);
     }
 
-    public function editPassword(array $data, User $user)
+    public function editPassword(array $data, Authenticatable|User $user): bool
     {
-        if ($user->update(['password' => Hash::make($data['new_password'])])) {
-            $user->notify(new PasswordChangedNotification($user));
-        }
+        return $user->update([
+            'password' => Hash::make($data['new_password']),
+        ]);
     }
 
 
-    public function toggleTheme()
+    public function toggleTheme(): void
     {
         auth()->user()->update(['darkmode' => !auth()->user()->darkmode]);
         $theme = auth()->user()->darkmode ? 'black' : 'retro';
         session(['theme' => $theme]);
     }
 
-    public function getUserList()
+    public function getAllUsers(): Collection
     {
-        return User::SortedUserList()->paginate(10);
+        return User::all();
     }
 
+    public function getUserList()
+    {
+        return User::withTrashed()->withCount(['posts', 'comments'])->with(['avatar', 'role'])->get();
+    }
 
-    private function checkTrashedUsers(array $data)
+    private function checkTrashedUsers(array $data): void
     {
         $trashedUser = User::onlyTrashed()->where('username', $data["username"])->orWhere('email', $data['email'])->first();
 
@@ -133,6 +114,37 @@ class UserService
             $trashedUser->media()->forceDelete();
             $trashedUser->forceDelete();
         }
+    }
+
+    public function getUserById(string $id): User
+    {
+        return User::find($id);
+    }
+
+    public function getUserByEmail($email): User
+    {
+        return User::whereEmail($email)->first();
+    }
+
+    public function getUserDataTable($users)
+    {
+        return DataTables::of($users)
+            ->editColumn('username', function ($user) {
+                return view('components.user-list.username', compact('user'));
+            })
+            ->editColumn('role_id', function ($user) {
+                return ucfirst($user->role->name);
+            })
+            ->editColumn('updated_at', function ($user) {
+                return Carbon::parse($user->created_at)->toDateTimeString();
+            })
+            ->editColumn('error_message', function ($user) {
+                return $user->error_message ?? "_";
+            })
+            ->addColumn('actions', function ($user) {
+                return view('components.user-list.actions', compact('user'));
+            })
+            ->toJson();
     }
 
 }

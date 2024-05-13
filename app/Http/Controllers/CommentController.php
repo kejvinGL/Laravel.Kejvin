@@ -11,11 +11,11 @@ use App\Services\UserService;
 
 class CommentController extends Controller
 {
-    public function __construct(private UserService $userService, private PostService $postService, private MediaService $mediaService, private commentService $commentService)
+    public function __construct( private commentService $commentService)
     {
     }
 
-    public function store(StoreCommentRequest $request, $post_id)
+    public function store(StoreCommentRequest $request, int $post_id)
     {
         try {
             $this->commentService->store($request->validated(), $post_id);

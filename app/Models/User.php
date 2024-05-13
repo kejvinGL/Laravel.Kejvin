@@ -14,10 +14,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
 
     /**
@@ -100,7 +101,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function scopeWhereRole(Builder $query, $role)
     {
-        $query->whereRelation('role', 'role', $role);
+        $query->whereRelation('role', 'name', $role);
     }
 
     public function scopeSortedUserList(Builder $query)
@@ -111,10 +112,5 @@ class User extends Authenticatable implements MustVerifyEmail
     public function scopeRecentUsers(Builder $query)
     {
         return $query->where('created_at', '>=', now()->subDay())->count();
-    }
-
-    public function prunable(): Builder
-    {
-        return static::where('deleted_at', '<=', now()->subMonth());
     }
 }

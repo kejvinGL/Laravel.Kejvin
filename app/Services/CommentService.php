@@ -10,7 +10,7 @@ class CommentService
 {
     public function store($data, $id)
     {
-        Comment::create([
+       return Comment::create([
             'user_id' => auth()->id(),
             'post_id' => $id,
             'body' => $data['body']
@@ -35,5 +35,10 @@ class CommentService
     public function restoreUserComments(User $user)
     {
         $user->comments()?->restore();
+    }
+
+    public function getUserComments(User $user)
+    {
+        return Comment::whereBelongsTo($user)->get();
     }
 }

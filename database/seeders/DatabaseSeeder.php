@@ -18,36 +18,36 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create([
-            'id' => 1,
-            'role' => 'admin'
-        ]);
+//        Role::create([
+//            'id' => 1,
+//            'name' => 'admin'
+//        ]);
+//
+//        Role::create([
+//            'id' => 2,
+//            'name' => 'client'
+//        ]);
 
-        Role::create([
-            'id' => 2,
-            'role' => 'client'
-        ]);
-
-        User::create([
-            'role_id' => 1,
-            'username' => 'admin',
-            'name' => 'admin',
-            'email' => "admin@admin.com",
-            'password' => Hash::make('12345678'),
-            'email_verified_at' => now(),
-        ]);
-
-        User::create([
-            'role_id' => 2,
-            'username' => 'kejvin',
-            'name' => 'Kejvin',
-            'email' => "kejvin.braka@atis.al",
-            'password' => Hash::make('12345678'),
-            'email_verified_at' => now(),
-        ]);
+//        User::create([
+//            'role_id' => 1,
+//            'username' => 'admin',
+//            'name' => 'admin',
+//            'email' => "admin@admin.com",
+//            'password' => Hash::make('12345678'),
+//            'email_verified_at' => now(),
+//        ]);
+//
+//        User::create([
+//            'role_id' => 2,
+//            'username' => 'kejvin',
+//            'name' => 'Kejvin',
+//            'email' => "kejvin.braka@atis.al",
+//            'password' => Hash::make('12345678'),
+//            'email_verified_at' => now(),
+//        ]);
 
 
-        User::factory(9)->create()->each(function ($user) {
+        User::factory(100)->create()->each(function ($user) {
             Post::factory(3)->create(
                 ['user_id' => $user->id,
                     'title' => implode(' ', [fake()->realText(50)]),

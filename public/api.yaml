@@ -1,0 +1,506 @@
+openapi: 3.0.0
+info:
+  title: Laravel.Kejvin API
+  description: Simple API to access data from the server
+  version: 0.1.0
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+security:
+  - ApiKeyAuth: [ ]
+
+servers:
+  - url: http://localhost:8000/api
+    description: local server
+
+paths:
+  /users:
+    get:
+      summary: Return a list of all Users
+      tags:
+        - User
+      responses:
+        200:
+          description: Returned all Users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        role:
+                          type: string
+                        name:
+                          type: string
+                        email:
+                          type: string
+                        post_count:
+                          type: integer
+                        comments_count:
+                          type: integer
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                      example:
+                        - id: 1
+                          role: admin
+                          name: Admin
+                          email: john@example.com
+                          post_count: 0
+                          comments_count: 0
+                          created_at: 0000-01-01T00:00:00.000000Z
+                          updated_at: 0000-01-01T00:00:00.000000Z
+                        - id: 2
+                          role: client
+                          name: John Doe
+                          email: john@example.com
+                          post_count: 1
+                          comments_count: 3
+                          created_at: 0000-01-01T00:00:00.000000Z
+                          updated_at: 0000-01-01T00:00:00.000000Z
+
+
+
+  /users/{user}:
+    get:
+      summary: Returns a user by ID.
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: user
+          description: New parameter
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      role:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      post_count:
+                        type: integer
+                      comments_count:
+                        type: integer
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                example:
+                  id: 1
+                  role: client
+                  name: John Doe
+                  email: john@example.com
+                  post_count: 1
+                  comments_count: 3
+                  created_at: 0000-01-01T00:00:00.000000Z
+                  updated_at: 0000-01-01T00:00:00.000000Z
+  /users/{user}/posts:
+    get:
+      summary: Get an User's posts.
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: user
+          description: New parameter
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Returned User's posts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  user:
+                    type: integer
+                    example: 2
+                  post_count:
+                    type: integer
+                    example: 2
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        author:
+                          type: integer
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        body:
+                          type: string
+                        media:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            user_id:
+                              type: integer
+                            post_id:
+                              type: integer
+                            path:
+                              type: string
+                            hash_name:
+                              type: string
+                            original_name:
+                              type: string
+                            ext:
+                              type: string
+                            size:
+                              type: integer
+                            type:
+                              type: string
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                            deleted_at:
+                              type: string
+                              nullable: true
+                        comments_count:
+                          type: integer
+
+                    example:
+                      - author: 2
+                        id: 3
+                        title: Example title text 1 (max:50)
+                        body: Example body 1 (max:500)
+                        media: null
+                        comments_count: 3
+                      - author: 2
+                        id: 6
+                        title: Example title text 1 (max:50)
+                        body: Example body 2 (max:500)
+                        media: null
+                        comments_count: 3
+
+  /users/{user}/comments:
+    get:
+      summary: Get an User's comments.
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: user
+          description: The ID of User the comments belong to.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Returned User's comments.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  user:
+                    type: integer
+                    example: 2
+                  post_count:
+                    type: integer
+                    example: 2
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        author:
+                          type: integer
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        body:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                    example:
+                      - author: 2
+                        post: 1
+                        body: Example body text 1 (max:150)
+                        created_at: 0000-01-01T00:00:00.000000Z
+                      - author: 2
+                        post: 2
+                        body: Example body text 2 (max:150)
+                        created_at: 0000-01-01T00:00:00.000000Z
+  /posts:
+    get:
+      summary: Return a list of all Posts
+      tags:
+        - Post
+      responses:
+        200:
+          description: Returned all Posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        author:
+                          type: integer
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        body:
+                          type: string
+                        media:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            user_id:
+                              type: integer
+                            post_id:
+                              type: integer
+                            path:
+                              type: string
+                            hash_name:
+                              type: string
+                            original_name:
+                              type: string
+                            ext:
+                              type: string
+                            size:
+                              type: integer
+                            type:
+                              type: string
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                            deleted_at:
+                              type: string
+                              nullable: true
+                        comments_count:
+                          type: integer
+
+
+                      example:
+                        - author: 2
+                          id: 3
+                          title: Example title text 1 (max:50)
+                          body: Example body 1 (max:500)
+                          media: null
+                          comments_count: 3
+
+  /posts/{post}:
+    get:
+      summary: Returns a Post by ID.
+      tags:
+        - Post
+      parameters:
+        - in: path
+          name: post
+          description: The ID of the Post to be returned
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  post:
+                    type: object
+                    properties:
+                      author:
+                        type: integer
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      body:
+                        type: string
+                      media:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          user_id:
+                            type: integer
+                          post_id:
+                            type: integer
+                          path:
+                            type: string
+                          hash_name:
+                            type: string
+                          original_name:
+                            type: string
+                          ext:
+                            type: string
+                          size:
+                            type: integer
+                          type:
+                            type: string
+                          created_at:
+                            type: string
+                            format: date-time
+                          updated_at:
+                            type: string
+                            format: date-time
+                          deleted_at:
+                            type: string
+                            nullable: true
+                      comments_count:
+                        type: integer
+
+
+                    example:
+                      author: 2
+                      id: 3
+                      title: Example title text 1 (max:50)
+                      body: Example body 1 (max:500)
+                      media: null
+                      comments_count: 3
+
+  /posts/{post}/comments:
+    get:
+      summary: Get an post's comments.
+      tags:
+        - Post
+      parameters:
+        - in: path
+          name: post
+          description: The ID of Post the comments belong to.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Returned a Post's comments.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  user:
+                    type: integer
+                    example: 2
+                  post_count:
+                    type: integer
+                    example: 2
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        author:
+                          type: integer
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        body:
+                          type: string
+                        media:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            user_id:
+                              type: integer
+                            post_id:
+                              type: integer
+                            path:
+                              type: string
+                            hash_name:
+                              type: string
+                            original_name:
+                              type: string
+                            ext:
+                              type: string
+                            size:
+                              type: integer
+                            type:
+                              type: string
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                            deleted_at:
+                              type: string
+                              nullable: true
+
+                        created_at:
+                          type: string
+                          format: date-time
+                    example:
+                      - author: 2
+                        post: 1
+                        title: Example title text 1 (max:50)
+                        body: Example body 1 (max:500)
+                        created_at: 0000-01-01T00:00:00.000000Z
+                      - author: 2
+                        post: 2
+                        title: Example title text 1 (max:50)
+                        created_at: 0000-01-01T00:00:00.000000Z

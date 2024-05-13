@@ -3,27 +3,29 @@
 @tailwind utilities;
 
 
-@layer components{
-    .flex-container{
+@layer components {
+    .flex-container {
         @apply flex flex-col items-center
     }
 
-    .iconed-input{
+    .iconed-input {
         @apply input input-bordered flex items-center gap-2
     }
 
-    .profile-tabs{
+    .profile-tabs {
         @apply tab-content bg-base-100 border-base-300 rounded-box w-[450px] h-[350px]
     }
-    .error-message{
+
+    .error-message {
         @apply label-text-alt text-red-500
     }
 
-    .success-message{
+    .success-message {
         @apply label-text-alt text-green-500
     }
 
 }
+
 * {
     box-sizing: border-box;
 }
@@ -31,14 +33,15 @@
 html {
     height: 100%;
 }
+
 body {
     font-family: "Noto Sans Mono", sans-serif;
     margin: 0;
     height: 100%;
     overflow: hidden;
-    @apply flex-container
+    background-color: #141414;
+    @apply flex-container overflow-y-auto bg-base-100
 }
-
 
 
 /*Start Animations*/
@@ -205,4 +208,24 @@ body {
         opacity: 0;
         border-radius: 50%;
     }
+}
+
+.dataTable thead tr {
+    @apply bg-base-200/50
+}
+
+.dataTable thead tr th {
+    @apply hover:bg-base-300;
+}
+
+.dataTable tbody tr {
+    @apply hover:bg-base-300/50;
+}
+
+.dt-ordering-desc, .dt-ordering-asc {
+    background-color: #141414;
+}
+
+.dt-button {
+    @apply btn
 }

@@ -6,9 +6,7 @@
             {{ __('A fresh verification link has been sent to your email address.') }}
         </div>
     @endif
-    {{-- User is not verified --}}
-    <p class="inline">Welcome, {{ auth()->user()->name }}!
-        Please </p>
+    <p class="inline">Welcome, {{ auth()->user()->name }}! Please </p>
     <form class="inline" action="{{route('verification.resend', auth()->user())}}" method="POST">
         @csrf
         <input type="submit" name="submit" value="verify your account" class="btn btn-link text-lg m-0 p-0">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Authentication;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
+use App\Services\UserService;
 use Barryvdh\LaravelIdeHelper\Eloquent;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,7 @@ class ResetPasswordController extends Controller
     public function showResetForm(Request $request, $token)
     {
         if ($request->hasValidSignature()) {
-            return view('auth.passwords.reset')->with(
+            return view('auth.pages.passwords.reset')->with(
                 [
                     'token' => $request->token,
                     'email' => $request->email,
@@ -36,7 +37,7 @@ class ResetPasswordController extends Controller
     {
         try {
             $resetRequest = $this->resetRequest($request->validated('token'));
-            $user = User::where('email', $request->validated('email'))->first();
+            $user = (new UserService)->getUserByEmail($request->validated('email'));
 
             $this->verifyUrlTimeLimit($resetRequest);
             $this->verifyUrlUsage($resetRequest);
@@ -54,7 +55,6 @@ class ResetPasswordController extends Controller
         $user->password = Hash::make($password);
         $user->setRememberToken(Str::random(60));
         $user->save();
-        event(new PasswordReset($user));
 
         $this->markTokenAsUsed($resetRequest);
 

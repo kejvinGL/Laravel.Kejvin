@@ -1,7 +1,7 @@
 <div class="h-20 w-full">
     <div class="flex justify-between w-full ">
         <div>
-            <img src="{{$comment->user->getAvatar()}}" class="size-8 inline" alt="commenter">
+            <img src="{{$comment->user->getAvatar()}}" class="size-8 inline" alt="{{$user->avatar->original_name ?? 'avatar'}}">
             <span>{{$comment->user->name}}</span>
         </div>
         @can('delete', $comment)

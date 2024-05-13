@@ -14,7 +14,7 @@ class ApiKey extends Model
     protected $fillable =[
         'name',
         'email',
-        'key',
+        'value',
     ];
 
 }

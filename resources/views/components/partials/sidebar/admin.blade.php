@@ -5,4 +5,6 @@
 <x-partials.sidebar.option :data="['url' => route('post_list'),'icon' => 'fa-solid fa-file','title' => __('Posts')]"/>
 <x-partials.sidebar.option :data="['url' => route('access'),'icon' => 'fa-solid fa-lock','title' => __('Access')]"/>
 <x-partials.sidebar.option :data="['url' => route('api_keys'),'icon' => 'fa-solid fa-key','title' => __('API Keys')]"/>
+<x-partials.sidebar.option :data="['url' => route('order_list'),'icon' => 'fa-solid fa-cart-shopping','title' => __('Orders')]"/>
+
 

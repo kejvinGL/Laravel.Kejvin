@@ -8,21 +8,15 @@ use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use App\Notifications\VerificationConfirmedNotification;
 use App\Services\LinkGeneratorService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
-    public function show(Request $request)
-    {
-        return $request->user->hasVerifiedEmail()
-            ? redirect(route('home'))
-            : view('auth.verify');
-
-    }
 
     public function verify(Request $request)
     {
-        $user = User::find($request->id);
+        $user = (new UserService)->getUserById($request->id);
 
         if (!$request->hasValidSignature()) {
             return redirect(route('home'))->with('error', 'Invalid or Expired Verification link.');

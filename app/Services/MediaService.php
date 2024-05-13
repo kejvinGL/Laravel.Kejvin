@@ -78,12 +78,13 @@ class MediaService
     public function deleteCurrentAvatar()
     {
         $currentAvatar = auth()->user()->avatar;
+
         $this->deleteMediaFromStorage($currentAvatar);
 
         return $currentAvatar?->forceDelete();
     }
 
-    private function setAvatar(mixed $file)
+    private function setAvatar(mixed $file): Media
     {
         $path = auth()->id() . '/' . $file->hashName();
         $this->saveNewMediaFile($file, $path);
